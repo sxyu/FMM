@@ -7,7 +7,7 @@
 
 constexpr char WIND_NAME[] = "Image";
 const char* WEIGHT_MAP_NAMES[] = {"Identity",  "Gradient magnitude", "AbsDiff", "Laplacian"};
-int weight_map = fmm::weight::GRADIENT;
+int weight_map = fmm::weight::ABSDIFF;
 bool segmentation_enabled = false;
 float thresh = 0.2;
 std::vector<cv::Point> seeds;
