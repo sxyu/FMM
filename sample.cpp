@@ -7,9 +7,9 @@
 
 constexpr char WIND_NAME[] = "Image";
 const char* WEIGHT_MAP_NAMES[] = {"Identity",  "Gradient magnitude", "AbsDiff", "Laplacian"};
-int weight_map = fmm::weight::ABSDIFF;
+int weight_map = fmm::weight::LAPLACIAN;
 bool segmentation_enabled = false;
-float thresh = 0.2;
+float thresh = 0.018;
 std::vector<cv::Point> seeds;
 
 void update(const cv::Mat& gray_float) {
@@ -35,12 +35,27 @@ int main(int argc, char** argv) {
     const std::string image_path = argv[1];
     if (argc > 2) weight_map = std::atoi(argv[2]);
 
-    cv::Mat image = cv::imread(image_path), image_gray, image_float;
-    cv::cvtColor(image, image_gray, cv::COLOR_BGR2GRAY);
-    assert(image_gray.type() == CV_8UC1);
-    image_gray.convertTo(image_float, CV_32FC1, 1.0/255.0);
+    cv::Mat image, image_float;
+    if (image_path.size() > 4 && !image_path.compare(image_path.size()-4, image_path.size(), ".exr")) {
+        // Depth image
+        image = cv::imread(image_path, cv::IMREAD_ANYCOLOR | cv::IMREAD_ANYDEPTH);
+    } else {
+        image = cv::imread(image_path);
+    }
+    if (image.channels() == 3) {
+        // Color to gray
+        cv::cvtColor(image, image, cv::COLOR_BGR2GRAY);
+    }
+    if (image.type() != CV_32FC1) {
+        // Byte to float
+        image.convertTo(image_float, CV_32FC1, 1.0/255.0);
+    } else {
+        // Normalize floats
+        cv::normalize(image, image_float,
+                       0.0, 1.0, cv::NORM_MINMAX, CV_32FC1);
+    }
     cv::namedWindow(WIND_NAME);
-    cv::imshow(WIND_NAME, image_float.clone());
+    cv::imshow(WIND_NAME, image_float);
     cv::setMouseCallback(WIND_NAME, mouse_handler, &image_float);
 
     printf("Click on the image to start Fast Marching Method from that point\n"
@@ -54,7 +69,8 @@ int main(int argc, char** argv) {
         if (k == 'q' || k == 27) break;
         if (seeds.empty()) continue; // Do not allow commands until user has clicked
         if (k == 'r') {
-            cv::imshow(WIND_NAME, image_float.clone());
+            cv::imshow(WIND_NAME, image_float);
+            continue;
         } else if (k >= '1' && k <= '4') {
             weight_map = k - '1';
             printf("Using weight map: %s\n", WEIGHT_MAP_NAMES[weight_map]); 
@@ -63,7 +79,8 @@ int main(int argc, char** argv) {
             printf("Segmentation %sabled\n", segmentation_enabled ? "en" : "dis"); 
             if (segmentation_enabled) printf("Segmentation threshold: %f press +- to adjust\n", thresh); 
         } else if (segmentation_enabled && (k == '+' || k == '=' || k == '-')) {
-            thresh -= 0.005 * (2 * int(k== '-') - 1);
+            auto sign = -(2 * int(k== '-') - 1);
+            thresh += thresh * 0.12 * sign;
             printf("Segmentation threshold: %f\n", thresh); 
         }
         update(image_float);
