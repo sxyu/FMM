@@ -29,7 +29,7 @@ static void mouse_handler(int event, int x, int y, int _, void* data){
 
 int main(int argc, char** argv) {
     if (argc < 2 || argc == 3 || argc > 6 || (argc >= 2 && strcmp(argv[1], "--help") == 0)) {
-        fprintf(stderr, "Usage: fmm-demo image_path [seedx seedy [weight_map_type_int [segment_thresh]]]\n");
+        fprintf(stderr, "Usage: fmmtool image_path [seedx seedy [weight_map_type_int [segment_thresh]]]\n");
         return 0;
     }
     const std::string image_path = argv[1];
