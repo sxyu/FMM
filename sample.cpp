@@ -28,12 +28,17 @@ static void mouse_handler(int event, int x, int y, int _, void* data){
 }
 
 int main(int argc, char** argv) {
-    if (argc < 2 || argc > 3 || (argc >= 2 && strcmp(argv[1], "--help") == 0)) {
-        fprintf(stderr, "Usage: fmm-demo image_path [(int 1-4) initial_weight_map]\n");
+    if (argc < 2 || argc == 3 || argc > 6 || (argc >= 2 && strcmp(argv[1], "--help") == 0)) {
+        fprintf(stderr, "Usage: fmm-demo image_path [seedx seedy [weight_map_type_int [segment_thresh]]]\n");
         return 0;
     }
     const std::string image_path = argv[1];
-    if (argc > 2) weight_map = std::atoi(argv[2]);
+    if (argc > 3) seeds.emplace_back(std::atoi(argv[2]), std::atoi(argv[3]));
+    if (argc > 4) weight_map = std::atoi(argv[4]);
+    if (argc > 5) {
+        segmentation_enabled = true;
+        thresh = static_cast<float>(std::atof(argv[5]));
+    }
 
     cv::Mat image, image_float;
     if (image_path.size() > 4 && !image_path.compare(image_path.size()-4, image_path.size(), ".exr")) {
@@ -54,10 +59,24 @@ int main(int argc, char** argv) {
         cv::normalize(image, image_float,
                        0.0, 1.0, cv::NORM_MINMAX, CV_32FC1);
     }
+
     cv::namedWindow(WIND_NAME);
+
+    if (argc > 2) {
+        // Just show the result image if many command line arguments are specified
+        printf("More than one command line argument specified, skipping UI and showing result...\n");
+        update(image_float);
+        cv::waitKey(0);
+        cv::destroyWindow(WIND_NAME);
+        return 0;
+    }
+
+    // Show initial image
     cv::imshow(WIND_NAME, image_float);
+    // Add callbacks
     cv::setMouseCallback(WIND_NAME, mouse_handler, &image_float);
 
+    // Create interface
     printf("Click on the image to start Fast Marching Method from that point\n"
            "Press r to view the initial image\n"
            "Press s to enable segmentation, then +- to adjust threshold\n"
