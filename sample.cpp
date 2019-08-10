@@ -9,7 +9,7 @@ constexpr char WIND_NAME[] = "Image";
 const char* WEIGHT_MAP_NAMES[] = {"Identity",  "Gradient magnitude", "AbsDiff", "Laplacian"};
 int weight_map = fmm::weight::LAPLACIAN;
 bool segmentation_enabled = false;
-float thresh = 0.018;
+float thresh = 0.018f;
 std::vector<cv::Point> seeds;
 
 void update(const cv::Mat& gray_float) {
@@ -80,7 +80,7 @@ int main(int argc, char** argv) {
             if (segmentation_enabled) printf("Segmentation threshold: %f press +- to adjust\n", thresh); 
         } else if (segmentation_enabled && (k == '+' || k == '=' || k == '-')) {
             auto sign = -(2 * int(k== '-') - 1);
-            thresh += thresh * 0.12 * sign;
+            thresh += thresh * 0.12f * sign;
             printf("Segmentation threshold: %f\n", thresh); 
         }
         update(image_float);

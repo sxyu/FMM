@@ -274,7 +274,7 @@ ImageLike fmm(const ImageLike& image,
 
     for (const auto& seed : seeds) {
         const auto id = seed.x + seed.y * image.cols;
-        que.emplace(id, seed.x, 0);
+        que.emplace(id, seed.x, 0.f);
         dist[id] = 0.;
     }
 
@@ -300,7 +300,8 @@ ImageLike fmm(const ImageLike& image,
 
     constexpr char __CELL_VISITED = char(255),
                    __CELL_NOT_VISITED = char(0);
-    auto __update_cell = [area, &image, &u, image_data, &que, dist, &cell_status, &__eikonal_update]() {
+    auto __update_cell = [area, &image, &u, image_data, &que, dist, &cell_status, &__eikonal_update,
+                          __CELL_VISITED, __CELL_NOT_VISITED]() {
         if (cell_status[u.id] == __CELL_VISITED) return;
         const T estimate = __eikonal_update();
         if (estimate < dist[u.id]) {
