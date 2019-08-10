@@ -44,12 +44,16 @@ int main(int argc, char** argv) {
     if (image_path.size() > 4 && !image_path.compare(image_path.size()-4, image_path.size(), ".exr")) {
         // Depth image
         image = cv::imread(image_path, cv::IMREAD_ANYCOLOR | cv::IMREAD_ANYDEPTH);
+        if (image.channels() == 3) {
+            // Was stored as XYZ map (point cloud), extract depth
+            cv::extractChannel(image, image, 2);
+        }
     } else {
         image = cv::imread(image_path);
-    }
-    if (image.channels() == 3) {
-        // Color to gray
-        cv::cvtColor(image, image, cv::COLOR_BGR2GRAY);
+        if (image.channels() == 3) {
+            // Color to gray
+            cv::cvtColor(image, image, cv::COLOR_BGR2GRAY);
+        }
     }
     if (image.type() != CV_32FC1) {
         // Byte to float
