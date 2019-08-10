@@ -20,7 +20,7 @@ if( NOT CMAKE_BUILD_TYPE )
 endif()
 
 set( PROJ_NAME "fmm" )
-set( OUTPUT_NAME "fmm-demo" )
+set( OUTPUT_NAME "fmmtool" )
 
 include( CheckCXXCompilerFlag )
 CHECK_CXX_COMPILER_FLAG( "-std=c++11" COMPILER_SUPPORTS_CXX11 )
