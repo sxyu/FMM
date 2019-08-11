@@ -1,12 +1,19 @@
 ## Fast marching method
 
 - To use in a project, include fmm.hpp and use `fmm::fmm<image_data_type>(image, seeds, weight_map_type[, image_segmentation_threshold])`
+This is a single-file header-only library without any dependencies. The CMakeLists.txt is only for building the sample program (which I encourage you to try).
 
-- If you are using OpenCV and only need support for OpenCV Mat's, there is the (almost) drop-in replacement `fmmcv.hpp` which should be faster since it uses some of OpenCV's built-in functions.
+- If you are using OpenCV and only need support for OpenCV Mat's, there is the (almost) drop-in replacement `fmmcv.hpp` which should be faster since it uses some of OpenCV's built-in functions. This, and the sample program, depend on OpenCV.
 
-- This is header-only and you do not need to build this, unless you want to build the sample program.
+- `fmm.hpp` Includes a bare-bones Image struct which allows you to use any row-major contiguous matrix type: `Image<field_type>(rows, cols, data_ptr)` or create a image managing its own memory: `Image<field_type>(rows, cols)`. The functions are also templated to support any Image, Point data types, and is by default compatible with OpenCV Mat/Point as well. To support a custom image type, you will have to specialize the `__create_like` template function which should create a new uninitizlized image of the same type and size as the input.
 
-- All functions are templated to be OpenCV Mat compatible, also includes bare-bones Image struct which allows you to use any row-major contiguous matrix type: `Image<filed_type>(rows, cols, data_ptr)`
+## Samples
+
+![Grayscale image segmentation (from OpenCV demo image)](/readme-images/graysegm.png)
+
+![Depth image segmentation (picture of me)](/readme-images/depthsegm.png)
+
+## Function documentation
 
 Comment on top of fmm.hpp copied here:
 ```cpp
