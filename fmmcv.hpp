@@ -19,7 +19,7 @@
  *                  output)
  *  > returns an image, either geodesic distance map or, if
  *    segmentation_threshold is given, a segmentation mask
- *  image: input image (OpenCV Mator)
+ *  image: input image (OpenCV Mat)
  *  seeds: std::vector of OpenCV Points
  *  weight_map_type: transformation to apply to input image to use as FMM
 *                    weight function. Can be one of:

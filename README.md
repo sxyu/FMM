@@ -9,8 +9,10 @@ This is a single-file header-only library without any dependencies. The CMakeLis
 
 ## Samples
 
+Computing distances/segmenting grayscale image (OpenCV sample image: fruit)
 ![Grayscale image segmentation (from OpenCV demo image)](/readme-images/graysegm.png)
 
+Computing distances/segmenting depth image (picture of me captured by Azure Kinect)
 ![Depth image segmentation (picture of me)](/readme-images/depthsegm.png)
 
 ## Function documentation
