@@ -156,33 +156,34 @@ ImageLike gradient_weights(const ImageLike& image, bool normalize_output = false
     const int area = image.rows * image.cols;
     const T* image_data = reinterpret_cast<T*>(image.data);
     T* out_data = reinterpret_cast<T*>(gradient_out.data);
+    T sobelx, sobely;
     while (idx < area) {
         for (j = 0; j < image.cols; ++j) {
-            T sobelx = 0, sobely = 0;
+            sobelx = sobely = 0;
             if (j > 0) {
                 if (idx - image.cols >= 0) {
-                    sobelx -= image_data[idx - image.cols - 1];
-                    sobely -= image_data[idx - image.cols - 1];
+                    sobelx = -3 * image_data[idx - image.cols - 1];
+                    sobely = -3 * image_data[idx - image.cols - 1];
                 }
-                sobelx -= 2 * image_data[idx - 1];
+                sobelx -= 10 * image_data[idx - 1];
                 if (idx + image.cols < area) {
-                    sobelx -= image_data[idx + image.cols - 1];
-                    sobely += image_data[idx + image.cols - 1];
+                    sobelx -= 3 * image_data[idx + image.cols - 1];
+                    sobely += 3 *image_data[idx + image.cols - 1];
                 }
             }
-            if (j + 1 > image.cols) {
+            if (j + 1 < image.cols) {
                 if (idx - image.cols >= 0) {
-                    sobelx += image_data[idx - image.cols + 1];
-                    sobely -= image_data[idx - image.cols + 1];
+                    sobelx += 3 * image_data[idx - image.cols + 1];
+                    sobely -= 3 * image_data[idx - image.cols + 1];
                 }
-                sobelx += 2 * image_data[idx + 1];
+                sobelx += 10 * image_data[idx + 1];
                 if (idx + image.cols < area) {
-                    sobelx += image_data[idx + image.cols + 1];
-                    sobely += image_data[idx + image.cols + 1];
+                    sobelx += 3 * image_data[idx + image.cols + 1];
+                    sobely += 3 * image_data[idx + image.cols + 1];
                 }
             }
-            if (idx - image.cols >= 0) sobely -= 2 * image_data[idx - image.cols];
-            if (idx + image.cols < area) sobely += 2 * image_data[idx + image.cols];
+            if (idx - image.cols >= 0) sobely -= 10 * image_data[idx - image.cols];
+            if (idx + image.cols < area) sobely += 10 * image_data[idx + image.cols];
             out_data[idx] = std::sqrt(sobelx * sobelx + sobely * sobely);
             ++idx;
         }
