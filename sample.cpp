@@ -7,9 +7,9 @@
 
 constexpr char WIND_NAME[] = "Image";
 const char* WEIGHT_MAP_NAMES[] = {"Identity",  "Gradient magnitude", "AbsDiff", "Laplacian"};
-int weight_map = fmm::weight::LAPLACIAN;
+int weight_map = fmm::weight::GRADIENT;
 bool segmentation_enabled = false;
-float thresh = 0.018f;
+float thresh = 0.072f;
 std::vector<cv::Point> seeds;
 
 void update(const cv::Mat& gray_float) {
