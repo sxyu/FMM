@@ -23,11 +23,11 @@
  *  seeds: std::vector of OpenCV Points
  *  weight_map_type: transformation to apply to input image to use as FMM
 *                    weight function. Can be one of:
- *                    fmm::weight::IDENTITY  no transformation (avoids a copy)
- *                    fmm::weight::GRADIENT  gradient magnitude (using Sobel) 
+ *                    fmm::weight::IDENTITY  no transformation (avoids a copy, faster)
+ *                    fmm::weight::GRADIENT  recommended: image gradient magnitude (using Sobel gradients) 
  *                    fmm::weight::ABSDIFF   absolute difference from average
  *                                           grayscale value of seeds
- *                    fmm::weight::LAPLACIAN image Laplacian magnitude
+ *                    fmm::weight::LAPLACIAN absolute value of image Laplacian
  *  segmentation_threshold: if specified, sets pixels with geodesic value less
  *                          than or equal to this threshold to 1 and others to 0
  *                          in the output image. If not given,the geodesic
