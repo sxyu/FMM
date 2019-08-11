@@ -42,8 +42,8 @@
  *          allocated. By default a new image is created, and this
  *          is not necessary.
  * */
-#ifndef FMM_HPP_DDF4F5D0_B8EA_11E9_8C9D_FFE443C4FFC0
-#define FMM_HPP_DDF4F5D0_B8EA_11E9_8C9D_FFE443C4FFC0
+#ifndef FMMCV_HPP_20F3B80A_BC6D_11E9_9091_AF23E9E714DF
+#define FMMCV_HPP_20F3B80A_BC6D_11E9_9091_AF23E9E714DF
 
 #include<cmath>
 #include<cstring>
@@ -222,4 +222,4 @@ cv::Mat fmm(const cv::Mat& image,
 }
 
 }
-#endif // FMM_HPP_DDF4F5D0_B8EA_11E9_8C9D_FFE443C4FFC0
+#endif // FMMCV_HPP_20F3B80A_BC6D_11E9_9091_AF23E9E714DF
