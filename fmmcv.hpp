@@ -212,8 +212,7 @@ cv::Mat fmm(const cv::Mat& image,
         if (u.id < area) __update_cell();
     }
     if (normalize_output_geodesic_distances) {
-        T maxval = *std::max_element(dist, dist + area);
-        for (int i = 0; i < area; ++i) dist[i] /= maxval;
+        cv::normalize(output, output, 0.0, 1.0, cv::NORM_MINMAX);
     }
     if (segmentation_threshold < INF) {
         cv::threshold(output, output, segmentation_threshold, 1.0, cv::THRESH_BINARY_INV);
