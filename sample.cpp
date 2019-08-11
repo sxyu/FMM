@@ -1,6 +1,7 @@
 /** Fast marching method sample project */
 #include <string>
-#include "fmmcv.hpp"
+#include "fmm.hpp"
+// #include "fmmcv.hpp" // Drop-in replacement if only using cv::Mat
 #include "opencv2/core.hpp"
 #include "opencv2/imgproc.hpp"
 #include "opencv2/highgui.hpp"
