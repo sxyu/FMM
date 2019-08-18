@@ -44,6 +44,8 @@ Comment on top of fmm.hpp copied here:
  *                                       If segmentation_threshold is specified,
  *                                       this occurs prior to segmentation.
  *                                       Default true.
+ *  max_visits: maximum number of points to visit. Can help speed up the computation
+ *              if objects larger than a certain area are eliminated (e.g. background)
  *  output: optionally, a pointer to an already-allocated output image.
  *          This allows you to avoid a copy if you already have one
  *          allocated. By default a new image is created, and this

@@ -37,6 +37,8 @@
  *                                       If segmentation_threshold is specified,
  *                                       this occurs prior to segmentation.
  *                                       Default true.
+ *  max_visits: maximum number of points to visit. Can help speed up the computation
+ *              if objects larger than a certain area are eliminated (e.g. background)
  *  output: optionally, a pointer to an already-allocated output image.
  *          This allows you to avoid a copy if you already have one
  *          allocated. By default a new image is created, and this
@@ -228,6 +230,7 @@ ImageLike fmm(const ImageLike& image,
          weight::WeightMap weight_map_type = weight::IDENTITY,
          T segmentation_threshold = std::numeric_limits<T>::max(),
          bool normalize_output_geodesic_distances = true,
+         int max_visits = -1,
          ImageLike* output = nullptr) {
     using namespace weight;
     using namespace __internal;
@@ -282,7 +285,12 @@ ImageLike fmm(const ImageLike& image,
     const T* image_data = reinterpret_cast<T*>(image_processed.data);
     __queue_cell<T> u;
 
-    auto __eikonal_update = [&u, &image, area, dist, image_data]() {
+    constexpr char __CELL_VISITED = char(255),
+                   __CELL_NOT_VISITED = char(0);
+    auto __update_cell = [area, &image, &u, image_data, &que, dist, &cell_status,
+                          __CELL_VISITED, __CELL_NOT_VISITED]() {
+        if (cell_status[u.id] == __CELL_VISITED) return;
+
         const T dleft  = u.x > 0                  ? dist[u.id - 1]    : INF;
         const T dright = u.x + 1 < image.cols     ? dist[u.id + 1]    : INF;
         const T dup    = u.id - image.cols >= 0   ? dist[u.id - image.cols] : INF;
@@ -292,19 +300,11 @@ ImageLike fmm(const ImageLike& image,
 
         const T cell_val = image_data[u.id];
         const T det = 2*dvert*dhoriz - dvert*dvert - dhoriz*dhoriz + 2*cell_val*cell_val;
-        if(det >= 0.) {
-            return 0.5f * (dhoriz+dvert + std::sqrt(det));
-        } else {
-            return std::min(dhoriz, dvert) + cell_val;
-        }
-    };
 
-    constexpr char __CELL_VISITED = char(255),
-                   __CELL_NOT_VISITED = char(0);
-    auto __update_cell = [area, &image, &u, image_data, &que, dist, &cell_status, &__eikonal_update,
-                          __CELL_VISITED, __CELL_NOT_VISITED]() {
-        if (cell_status[u.id] == __CELL_VISITED) return;
-        const T estimate = __eikonal_update();
+        const T estimate = det >= 0. ?
+            0.5f * (dhoriz+dvert + std::sqrt(det)) :
+            std::min(dhoriz, dvert) + cell_val;
+        
         if (estimate < dist[u.id]) {
             dist[u.id] = estimate;
             if (cell_status[u.id] == __CELL_NOT_VISITED) {
@@ -315,10 +315,11 @@ ImageLike fmm(const ImageLike& image,
         }
     };
 
-    while (!que.empty()) {
+    while (!que.empty() && max_visits--) {
         u = que.top(); que.pop();
 
-        if (cell_status[u.id] == __CELL_VISITED) continue;
+        if (cell_status[u.id] == __CELL_VISITED ||
+            dist[u.id] > segmentation_threshold) continue;
         cell_status[u.id] = __CELL_VISITED;
 
         --u.id; --u.x;

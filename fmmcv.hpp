@@ -32,6 +32,8 @@
  *                          than or equal to this threshold to 1 and others to 0
  *                          in the output image. If not given,the geodesic
  *                          distances map will be returned.
+ *  max_visits: maximum number of points to visit. Can help speed up the computation
+ *              if objects larger than a certain area are eliminated (e.g. background)
  *  normalize_output_geodesic_distances: if true, normalizes geodesic distances
  *                                       values to be in the interval [0, 1].
  *                                       If segmentation_threshold is specified,
@@ -114,6 +116,7 @@ cv::Mat fmm(const cv::Mat& image,
          weight::WeightMap weight_map_type = weight::IDENTITY,
          T segmentation_threshold = std::numeric_limits<T>::max(),
          bool normalize_output_geodesic_distances = true,
+         int max_visits = -1,
          cv::Mat output = cv::Mat()) {
     using namespace weight;
     using namespace __internal;
@@ -194,10 +197,11 @@ cv::Mat fmm(const cv::Mat& image,
         }
     };
 
-    while (!que.empty()) {
+    while (!que.empty() && max_visits--) {
         u = que.top(); que.pop();
 
-        if (cell_status[u.id] == __CELL_VISITED) continue;
+        if (cell_status[u.id] == __CELL_VISITED ||
+            dist[u.id] > segmentation_threshold) continue;
         cell_status[u.id] = __CELL_VISITED;
 
         --u.id; --u.x;
